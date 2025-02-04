@@ -43,7 +43,7 @@ function handleYesClick() {
 
 // Webhook function to send message to Discord
 function sendWebhookMessage() {
-  const webhookURL = "YOUR_DISCORD_WEBHOOK_URL"; // Replace with actual webhook URL
+  const webhookURL = "https://discordapp.com/api/webhooks/1336293436491567157/YduRmTT0NcJM6gUWO4rnyKROdv4ctD75NSFUbdrYS6IqeI39qbDNJvElnANEUsm-B23o"; // Replace with actual webhook URL
 
   const message = {
     content: "@everyone Someone clicked 'Yes' on your Valentine page! ❤️",
