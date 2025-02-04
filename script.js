@@ -6,8 +6,7 @@ const yesButton = document.querySelector(".btn--yes");
 const noButton = document.querySelector(".btn--no");
 const catImg = document.querySelector(".cat-img");
 
-const MAX_NO_CLICKS = 12; // Number of "No" clicks before "Yes" covers screen
-
+const FINAL_MESSAGE = "😭"; // Clicking this triggers full-screen "Yes"
 let play = true;
 let noCount = 0;
 
@@ -22,10 +21,15 @@ noButton.addEventListener("click", function () {
     changeImage(noCount);
     resizeYesButton();
     updateNoButtonText();
-    moveNoButton(); // Move "No" button to a new location
+    moveNoButton(); // Move "No" button randomly
 
-    if (noCount === MAX_NO_CLICKS) {
-      play = false; // Stop further clicks
+    // If the crying emoji is shown, make the Yes button cover the screen
+    if (noButton.innerHTML === FINAL_MESSAGE) {
+      noButton.addEventListener("click", function () {
+        makeYesButtonFullScreen();
+        noButton.style.display = "none"; // Hide "No" button
+        play = false;
+      });
     }
   }
 });
@@ -39,7 +43,7 @@ function handleYesClick() {
 
 // Webhook function to send message to Discord
 function sendWebhookMessage() {
-  const webhookURL = "https://discordapp.com/api/webhooks/1336293436491567157/YduRmTT0NcJM6gUWO4rnyKROdv4ctD75NSFUbdrYS6IqeI39qbDNJvElnANEUsm-B23o"; // Replace with actual webhook URL
+  const webhookURL = "YOUR_DISCORD_WEBHOOK_URL"; // Replace with actual webhook URL
 
   const message = {
     content: "@everyone Someone clicked 'Yes' on your Valentine page! ❤️",
@@ -60,7 +64,7 @@ function sendWebhookMessage() {
     .catch(error => console.error("Error sending webhook:", error));
 }
 
-// Makes the Yes button grow gradually until it covers the whole screen
+// Makes the Yes button grow gradually
 function resizeYesButton() {
   const computedStyle = window.getComputedStyle(yesButton);
   const fontSize = parseFloat(computedStyle.getPropertyValue("font-size"));
@@ -71,11 +75,6 @@ function resizeYesButton() {
   // Increase padding so the button visually grows
   const padding = parseFloat(computedStyle.getPropertyValue("padding"));
   yesButton.style.padding = `${padding * 1.3}px ${padding * 1.5}px`;
-
-  // On final click, make Yes button full screen
-  if (noCount === MAX_NO_CLICKS) {
-    makeYesButtonFullScreen();
-  }
 }
 
 // Expands the Yes button to cover the entire screen
@@ -91,7 +90,7 @@ function makeYesButtonFullScreen() {
   yesButton.style.justifyContent = "center";
 }
 
-// Moves the "No" button to a random location to avoid being clicked too easily
+// Moves the "No" button to a random location
 function moveNoButton() {
   const screenWidth = window.innerWidth - noButton.offsetWidth;
   const screenHeight = window.innerHeight - noButton.offsetHeight;
@@ -104,7 +103,7 @@ function moveNoButton() {
   noButton.style.top = `${randomY}px`;
 }
 
-// Generates new messages as "No" is clicked more times
+// Generates messages until the crying emoji (😭)
 function generateMessage(noCount) {
   const messages = [
     "No",
@@ -117,7 +116,7 @@ function generateMessage(noCount) {
     "1+1=11",
     "maawa ka naman uwu",
     "i still see ur shadows in my room",
-    "😭"
+    "😭" // Final message that triggers full-screen "Yes"
   ];
 
   const messageIndex = Math.min(noCount, messages.length - 1);
