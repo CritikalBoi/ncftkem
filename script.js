@@ -6,7 +6,7 @@ const yesButton = document.querySelector(".btn--yes");
 const noButton = document.querySelector(".btn--no");
 const catImg = document.querySelector(".cat-img");
 
-const MAX_IMAGES = 10;
+const MAX_NO_CLICKS = 12; // Number of "No" clicks before "Yes" covers screen
 
 let play = true;
 let noCount = 0;
@@ -19,12 +19,13 @@ yesButton.addEventListener("click", function () {
 noButton.addEventListener("click", function () {
   if (play) {
     noCount++;
-    const imageIndex = Math.min(noCount, MAX_IMAGES);
-    changeImage(imageIndex);
+    changeImage(noCount);
     resizeYesButton();
     updateNoButtonText();
-    if (noCount === MAX_IMAGES) {
-      play = false;
+    moveNoButton(); // Move "No" button to a new location
+
+    if (noCount === MAX_NO_CLICKS) {
+      play = false; // Stop further clicks
     }
   }
 });
@@ -59,20 +60,20 @@ function sendWebhookMessage() {
     .catch(error => console.error("Error sending webhook:", error));
 }
 
-// Makes the Yes button grow until it covers the whole screen
+// Makes the Yes button grow gradually until it covers the whole screen
 function resizeYesButton() {
   const computedStyle = window.getComputedStyle(yesButton);
   const fontSize = parseFloat(computedStyle.getPropertyValue("font-size"));
-  const newFontSize = fontSize * 1.6;
+  const newFontSize = fontSize * 1.5;
 
   yesButton.style.fontSize = `${newFontSize}px`;
-  
-  // Increase padding so button grows visually
+
+  // Increase padding so the button visually grows
   const padding = parseFloat(computedStyle.getPropertyValue("padding"));
-  yesButton.style.padding = `${padding * 1.5}px ${padding * 2}px`;
-  
-  // If the button gets too big, force it to take the whole screen
-  if (newFontSize > 100) {
+  yesButton.style.padding = `${padding * 1.3}px ${padding * 1.5}px`;
+
+  // On final click, make Yes button full screen
+  if (noCount === MAX_NO_CLICKS) {
     makeYesButtonFullScreen();
   }
 }
@@ -88,6 +89,19 @@ function makeYesButtonFullScreen() {
   yesButton.style.display = "flex";
   yesButton.style.alignItems = "center";
   yesButton.style.justifyContent = "center";
+}
+
+// Moves the "No" button to a random location to avoid being clicked too easily
+function moveNoButton() {
+  const screenWidth = window.innerWidth - noButton.offsetWidth;
+  const screenHeight = window.innerHeight - noButton.offsetHeight;
+
+  const randomX = Math.floor(Math.random() * screenWidth);
+  const randomY = Math.floor(Math.random() * screenHeight);
+
+  noButton.style.position = "absolute";
+  noButton.style.left = `${randomX}px`;
+  noButton.style.top = `${randomY}px`;
 }
 
 // Generates new messages as "No" is clicked more times
